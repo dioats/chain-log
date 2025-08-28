@@ -12,7 +12,7 @@
 
     <!-- Campo de input para ID da Operação -->
     <EditText
-        android:id="@+id/etOperationId"
+        android:id="@+id/edittext_operation_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -23,7 +23,7 @@
 
     <!-- Botão Scan -->
     <Button
-        android:id="@+id/btnScan"
+        android:id="@+id/btn_scan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
@@ -33,14 +33,14 @@
         android:textColor="@android:color/white"/>
 
     <LinearLayout
-        android:id="@+id/layoutProgress"
+        android:id="@+id/layout_progress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="visible">   <!-- começa escondido -->
+        android:visibility="gone">
 
         <TextView
-            android:id="@+id/tvProgressTitle"
+            android:id="@+id/textview_progress_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
@@ -49,7 +49,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tvPhotosStatus"
+            android:id="@+id/textview_photos_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -57,7 +57,7 @@
             android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/tvCallsStatus"
+            android:id="@+id/textview_calls_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -65,7 +65,7 @@
             android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/tvDeviceStatus"
+            android:id="@+id/textview_devices_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
