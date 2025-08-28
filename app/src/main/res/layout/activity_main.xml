@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F9F9F9"
+    android:gravity="top"
+    android:orientation="vertical"
+    android:paddingHorizontal="24dp"
+    android:paddingTop="64dp"
+    >
+
+    <!-- Campo de input para ID da Operação -->
+    <EditText
+        android:id="@+id/etOperationId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@android:drawable/edit_text"
+        android:hint="Digite o ID da operação"
+        android:inputType="text"
+        android:padding="12dp" />
+
+    <!-- Botão Scan -->
+    <Button
+        android:id="@+id/btnScan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:backgroundTint="@color/primary"
+        android:padding="12dp"
+        android:text="Iniciar Scan"
+        android:textColor="@android:color/white"/>
+
+    <LinearLayout
+        android:id="@+id/layoutProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="visible">   <!-- começa escondido -->
+
+        <TextView
+            android:id="@+id/tvProgressTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Progresso da coleta:"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvPhotosStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="📷 Fotos: iniciando..."
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvCallsStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="📞 Chamadas: iniciando..."
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvDeviceStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="📱 Informações do dispositivo: iniciando..."
+            android:textSize="14sp" />
+    </LinearLayout>
+</LinearLayout>
