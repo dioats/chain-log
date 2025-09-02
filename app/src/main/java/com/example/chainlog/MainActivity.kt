@@ -1,12 +1,15 @@
 package com.example.chainlog
 
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.chainlog.utils.PermissionHelper
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var textViewPhotosStatus: TextView
     private lateinit var textViewCallsStatus: TextView
     private lateinit var textViewDeviceStatus: TextView
+    private val REQUEST_CALL_LOG = 1001
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +43,38 @@ class MainActivity : AppCompatActivity() {
             layoutProgress.visibility = LinearLayout.VISIBLE
 
             // TODO: Aqui vamos chamar DataCollector e FirebaseUploader
-            textViewPhotosStatus.text = "📷 Fotos: coletando..."
             textViewCallsStatus.text = "📞 Chamadas: esperando..."
+            textViewPhotosStatus.text = "📷 Fotos: esperando..."
             textViewDeviceStatus.text = "📱 Informações do dispositivo: esperando..."
+
+            if (!PermissionHelper.hasPermission(this, android.Manifest.permission.READ_CALL_LOG)) {
+                PermissionHelper.requestPermission(this, arrayOf(android.Manifest.permission.READ_CALL_LOG), REQUEST_CALL_LOG)
+            } else {
+                collectCalls()
+            }
+
+
+        }
+    }
+
+    private fun collectCalls() {
+        Log.d("MainActivity", "[collectCalls] coletando dados das chamadas");
+        textViewCallsStatus.text = "📞 Chamadas: coletando..."
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray) {
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == REQUEST_CALL_LOG) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                collectCalls()
+            } else {
+                textViewCallsStatus.text = "📞 Chamadas: permissão negada ❌"
+            }
         }
     }
 }

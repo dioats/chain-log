@@ -49,19 +49,19 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/textview_photos_status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="📷 Fotos: iniciando..."
-            android:textSize="14sp" />
-
-        <TextView
             android:id="@+id/textview_calls_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:text="📞 Chamadas: iniciando..."
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/textview_photos_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="📷 Fotos: iniciando..."
             android:textSize="14sp" />
 
         <TextView
