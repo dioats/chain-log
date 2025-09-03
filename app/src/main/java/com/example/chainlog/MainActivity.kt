@@ -9,7 +9,11 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.chainlog.data.DataCollector
+import com.example.chainlog.firebase.FirebaseUploader
 import com.example.chainlog.utils.PermissionHelper
+import com.google.firebase.FirebaseApp
+import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,11 +23,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var textViewPhotosStatus: TextView
     private lateinit var textViewCallsStatus: TextView
     private lateinit var textViewDeviceStatus: TextView
+
+    private lateinit var deviceId: String
     private val REQUEST_CALL_LOG = 1001
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        FirebaseApp.initializeApp(this)
+
+        deviceId = UUID.randomUUID().toString()
 
         editTextOperationId = findViewById(R.id.edittext_operation_id)
         btnScan = findViewById(R.id.btn_scan)
@@ -43,23 +52,12 @@ class MainActivity : AppCompatActivity() {
             layoutProgress.visibility = LinearLayout.VISIBLE
 
             // TODO: Aqui vamos chamar DataCollector e FirebaseUploader
+            textViewDeviceStatus.text = "📱 Informações do dispositivo: esperando..."
             textViewCallsStatus.text = "📞 Chamadas: esperando..."
             textViewPhotosStatus.text = "📷 Fotos: esperando..."
-            textViewDeviceStatus.text = "📱 Informações do dispositivo: esperando..."
 
-            if (!PermissionHelper.hasPermission(this, android.Manifest.permission.READ_CALL_LOG)) {
-                PermissionHelper.requestPermission(this, arrayOf(android.Manifest.permission.READ_CALL_LOG), REQUEST_CALL_LOG)
-            } else {
-                collectCalls()
-            }
-
-
+            collectDeviceInfo()
         }
-    }
-
-    private fun collectCalls() {
-        Log.d("MainActivity", "[collectCalls] coletando dados das chamadas");
-        textViewCallsStatus.text = "📞 Chamadas: coletando..."
     }
 
     override fun onRequestPermissionsResult(
@@ -74,6 +72,57 @@ class MainActivity : AppCompatActivity() {
                 collectCalls()
             } else {
                 textViewCallsStatus.text = "📞 Chamadas: permissão negada ❌"
+            }
+        }
+    }
+
+    private fun collectDeviceInfo() {
+        Log.d("MainActivity", "[collectDeviceInfo] coletando dados do dispositivo");
+        textViewDeviceStatus.text = "📱 Informações do dispositivo: coletando..."
+
+        val operationId = editTextOperationId.text.toString().trim()
+        val deviceInfo = DataCollector.getDeviceInfo()
+
+        FirebaseUploader.initDevice(deviceId, operationId, deviceInfo) { success ->
+            runOnUiThread {
+                if (success) {
+                    textViewDeviceStatus.text = "📱 Informações do dispositivo: concluído ✔️"
+                    if (!PermissionHelper.hasPermission(this, android.Manifest.permission.READ_CALL_LOG)) {
+                        PermissionHelper.requestPermission(
+                            this,
+                            arrayOf(android.Manifest.permission.READ_CALL_LOG),
+                            REQUEST_CALL_LOG)
+                    } else {
+                        collectCalls()
+                    }
+                } else {
+                    textViewDeviceStatus.text = "📱 Informações do dispositivo: erro ❌"
+                    textViewCallsStatus.text = "📞 Chamadas: cancelado por erro ❌"
+                    textViewPhotosStatus.text = "📷 Fotos: cancelado por erro ❌"
+                }
+            }
+        }
+    }
+
+    private fun collectCalls() {
+        Log.d("MainActivity", "[collectCalls] coletando dados das chamadas");
+        textViewCallsStatus.text = "📞 Chamadas: coletando..."
+
+        val calls = DataCollector.getLastCalls(this, 5)
+
+        if (calls.isEmpty()) {
+            textViewCallsStatus.text = "📞 Chamadas: nenhuma encontrada"
+            return
+        }
+
+        // Envia para o Firebase
+        FirebaseUploader.uploadCalls(deviceId, calls) { success ->
+            runOnUiThread {
+                textViewCallsStatus.text = if (success) {
+                    "📞 Chamadas: concluído ✔️"
+                } else {
+                    "📞 Chamadas: erro no upload ❌"
+                }
             }
         }
     }

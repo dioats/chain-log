@@ -49,6 +49,14 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/textview_devices_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="📱 Informações do dispositivo: iniciando..."
+            android:textSize="14sp" />
+
+        <TextView
             android:id="@+id/textview_calls_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -62,14 +70,6 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:text="📷 Fotos: iniciando..."
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/textview_devices_status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="📱 Informações do dispositivo: iniciando..."
             android:textSize="14sp" />
     </LinearLayout>
 </LinearLayout>
