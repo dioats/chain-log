@@ -1,6 +1,8 @@
 package com.example.chainlog.data
 
+import android.content.ContentUris
 import android.content.Context
+import android.provider.MediaStore
 import com.example.chainlog.data.models.CallInfo
 import com.example.chainlog.data.models.DeviceInfo
 import com.example.chainlog.data.models.PhotoInfo
@@ -60,7 +62,54 @@ object DataCollector {
     }
 
     fun getLastPhotos(context: Context, limit: Int = 5): List<PhotoInfo> {
-        // TODO: Implementar coleta de fotos via MediaStore
-        return emptyList()
+        val photos = mutableListOf<PhotoInfo>()
+
+        val collection = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+        } else {
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        }
+
+        val projection = arrayOf(
+            MediaStore.Images.Media._ID,
+            MediaStore.Images.Media.DATE_TAKEN
+        )
+
+        val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC"
+
+        val cursor = context.contentResolver.query(
+            collection,
+            projection,
+            null,
+            null,
+            sortOrder
+        )
+
+        cursor?.use {
+            val idColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            val dateColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)
+
+            var count = 0
+            while (it.moveToNext() && count < limit) {
+                val id = it.getLong(idColumn)
+                val dateTaken = it.getLong(dateColumn)
+
+                val contentUri = ContentUris.withAppendedId(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    id
+                )
+
+                photos.add(
+                    PhotoInfo(
+                        uri = contentUri.toString(),
+                        dateTaken = dateTaken
+                    )
+                )
+
+                count++
+            }
+        }
+
+        return photos
     }
 }

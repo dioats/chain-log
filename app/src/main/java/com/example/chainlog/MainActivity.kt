@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var deviceId: String
     private val REQUEST_CALL_LOG = 1001
+    private val REQUEST_MEDIA_IMAGES = 1002
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,8 +51,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             layoutProgress.visibility = LinearLayout.VISIBLE
-
-            // TODO: Aqui vamos chamar DataCollector e FirebaseUploader
             textViewDeviceStatus.text = "📱 Informações do dispositivo: esperando..."
             textViewCallsStatus.text = "📞 Chamadas: esperando..."
             textViewPhotosStatus.text = "📷 Fotos: esperando..."
@@ -74,6 +73,14 @@ class MainActivity : AppCompatActivity() {
                 textViewCallsStatus.text = "📞 Chamadas: permissão negada ❌"
             }
         }
+
+        if(requestCode == REQUEST_MEDIA_IMAGES) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                collectPhotos()
+            } else {
+                textViewPhotosStatus.text = "📷 Fotos: permissão negada ❌"
+            }
+        }
     }
 
     private fun collectDeviceInfo() {
@@ -84,22 +91,14 @@ class MainActivity : AppCompatActivity() {
         val deviceInfo = DataCollector.getDeviceInfo()
 
         FirebaseUploader.initDevice(deviceId, operationId, deviceInfo) { success ->
-            runOnUiThread {
-                if (success) {
-                    textViewDeviceStatus.text = "📱 Informações do dispositivo: concluído ✔️"
-                    if (!PermissionHelper.hasPermission(this, android.Manifest.permission.READ_CALL_LOG)) {
-                        PermissionHelper.requestPermission(
-                            this,
-                            arrayOf(android.Manifest.permission.READ_CALL_LOG),
-                            REQUEST_CALL_LOG)
-                    } else {
-                        collectCalls()
-                    }
-                } else {
-                    textViewDeviceStatus.text = "📱 Informações do dispositivo: erro ❌"
-                    textViewCallsStatus.text = "📞 Chamadas: cancelado por erro ❌"
-                    textViewPhotosStatus.text = "📷 Fotos: cancelado por erro ❌"
-                }
+            if (success) {
+                textViewDeviceStatus.text = "📱 Informações do dispositivo: concluído ✔️"
+                collectCalls()
+                collectPhotos()
+            } else {
+                textViewDeviceStatus.text = "📱 Informações do dispositivo: cancelado por erro ❌"
+                textViewCallsStatus.text = "📞 Chamadas: cancelado por erro ❌"
+                textViewPhotosStatus.text = "📷 Fotos: cancelado por erro ❌"
             }
         }
     }
@@ -108,6 +107,14 @@ class MainActivity : AppCompatActivity() {
         Log.d("MainActivity", "[collectCalls] coletando dados das chamadas");
         textViewCallsStatus.text = "📞 Chamadas: coletando..."
 
+        if (!PermissionHelper.hasPermission(this, android.Manifest.permission.READ_CALL_LOG)) {
+            PermissionHelper.requestPermission(
+                this,
+                arrayOf(android.Manifest.permission.READ_CALL_LOG),
+                REQUEST_CALL_LOG)
+            return
+        }
+
         val calls = DataCollector.getLastCalls(this, 5)
 
         if (calls.isEmpty()) {
@@ -115,14 +122,39 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // Envia para o Firebase
         FirebaseUploader.uploadCalls(deviceId, calls) { success ->
-            runOnUiThread {
-                textViewCallsStatus.text = if (success) {
-                    "📞 Chamadas: concluído ✔️"
-                } else {
-                    "📞 Chamadas: erro no upload ❌"
-                }
+            if(success) {
+                textViewCallsStatus.text = "📞 Chamadas: concluído ✔️"
+            } else {
+                textViewCallsStatus.text = "📞 Chamadas: erro no upload ❌"
+            }
+        }
+    }
+
+    private fun collectPhotos() {
+        Log.d("MainActivity", "[collectPhotos] coletando dados das imagens");
+        textViewPhotosStatus.text = "📷 Fotos: coletando..."
+
+        if (!PermissionHelper.hasPermission(this, android.Manifest.permission.READ_MEDIA_IMAGES)) {
+            PermissionHelper.requestPermission(
+                this,
+                arrayOf(android.Manifest.permission.READ_MEDIA_IMAGES),
+                REQUEST_MEDIA_IMAGES)
+            return
+        }
+
+        val photos = DataCollector.getLastPhotos(this, 5)
+
+        if (photos.isEmpty()) {
+            textViewPhotosStatus.text = "📷 Fotos: nenhuma encontrada"
+            return
+        }
+
+        FirebaseUploader.uploadPhotos(deviceId, photos) { success ->
+            if(success) {
+                textViewPhotosStatus.text = "📷 Fotos: concluído ✔️"
+            } else {
+                textViewPhotosStatus.text = "📷 Fotos: erro no upload ❌"
             }
         }
     }
