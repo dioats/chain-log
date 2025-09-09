@@ -30,8 +30,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
         FirebaseApp.initializeApp(this)
+        setContentView(R.layout.activity_main)
 
         deviceId = UUID.randomUUID().toString()
 
@@ -150,7 +150,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        FirebaseUploader.uploadPhotos(deviceId, photos) { success ->
+        FirebaseUploader.uploadPhotos(this, deviceId, photos) { success ->
             if(success) {
                 textViewPhotosStatus.text = "📷 Fotos: concluído ✔️"
             } else {
