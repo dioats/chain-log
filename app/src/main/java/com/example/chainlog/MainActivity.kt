@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
 
         FirebaseUploader.initDevice(deviceId, operationId, deviceInfo) { success ->
             if (success) {
-                textViewDeviceStatus.text = "📱 Informações do dispositivo: concluído ✔️"
+                textViewDeviceStatus.text = "📱 Informações do dispositivo: concluído ✅"
                 collectCalls()
                 collectPhotos()
             } else {
@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity() {
 
         FirebaseUploader.uploadCalls(deviceId, calls) { success ->
             if(success) {
-                textViewCallsStatus.text = "📞 Chamadas: concluído ✔️"
+                textViewCallsStatus.text = "📞 Chamadas: concluído ✅"
             } else {
                 textViewCallsStatus.text = "📞 Chamadas: erro no upload ❌"
             }
@@ -152,7 +152,7 @@ class MainActivity : AppCompatActivity() {
 
         FirebaseUploader.uploadPhotos(this, deviceId, photos) { success ->
             if(success) {
-                textViewPhotosStatus.text = "📷 Fotos: concluído ✔️"
+                textViewPhotosStatus.text = "📷 Fotos: concluído ✅"
             } else {
                 textViewPhotosStatus.text = "📷 Fotos: erro no upload ❌"
             }
